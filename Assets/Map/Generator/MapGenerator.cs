@@ -1,4 +1,3 @@
-using Map.Pathfinding;
 using UnityEngine;
 
 namespace Map.Generator
@@ -49,14 +48,14 @@ namespace Map.Generator
         [SerializeField] [Range(0, 100)] private float _rockRatio;
         [SerializeField] [Range(0, 100)] private float _emptyRatio;
 
-
         public void Awake()
         {
         }
 
-        public void GenerateMap()
+
+        public MapDetail[,] GenerateMap()
         {
-            this.ClearMap(this._map);
+            this._ClearMap(this._map);
             MapRatio ratio = this._GetRatio(
                 this._wallRatio,
                 this._waterRatio,
@@ -65,10 +64,10 @@ namespace Map.Generator
                 this._rockRatio,
                 this._emptyRatio
             );
-            MapDetail[,] details = this._GenerateMapDetails(this._xSize, this._ySize, this._seed, ratio);
+            MapDetail[,] mapDetails = this._GenerateMapDetails(this._xSize, this._ySize, this._seed, ratio);
             this._GenerateMap(
                 this._map,
-                details,
+                mapDetails,
                 this._wallPrefab,
                 this._waterPrefab,
                 this._treePrefab,
@@ -76,9 +75,11 @@ namespace Map.Generator
                 this._rockPrefab,
                 this._emptyPrefab
             );
+
+            return mapDetails;
         }
 
-        private void ClearMap(Transform map)
+        private void _ClearMap(Transform map)
         {
             for (int i = map.childCount - 1; i >= 0; i--)
             {

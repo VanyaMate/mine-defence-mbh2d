@@ -1,107 +1,107 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Map.Generator;
 using UnityEngine;
-
-// generated
 
 namespace Map.Pathfinding
 {
-    public class FlowMapGenerator
+    public class MapFlowGenerator
     {
-        private int _width;
-        private int _height;
-        private Vector2[,] _flowField;
-        private int[,] _costField;
-        private Queue<Vector2Int> _queue = new Queue<Vector2Int>();
-
-        public FlowMapGenerator(int width, int height)
+        private static readonly Dictionary<MapDetail, int> TerrainCost = new Dictionary<MapDetail, int>
         {
-            _width = width;
-            _height = height;
-            _flowField = new Vector2[width, height];
-            _costField = new int[width, height];
-        }
+            { MapDetail.Wall, int.MaxValue },
+            { MapDetail.Water, 10 },
+            { MapDetail.Tree, 5 },
+            { MapDetail.Grass, 1 },
+            { MapDetail.Rock, 1 },
+            { MapDetail.Empty, 1 }
+        };
 
-        public Vector2[,] GenerateFlowMap(Vector2Int[] targets, int[,] terrainCost)
+        public static Vector2[,] GetFlowMap(MapDetail[,] details, Vector2[] targetPositions)
         {
-            _costField = terrainCost;
-            _flowField = new Vector2[_width, _height];
+            int width = details.GetLength(0);
+            int height = details.GetLength(1);
+            Vector2[,] flowMap = new Vector2[width, height];
+            int[,] distanceMap = new int[width, height];
 
-            // Очистка карты направлений
-            for (int x = 0; x < _width; x++)
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < _height; y++)
+                for (int y = 0; y < height; y++)
                 {
-                    _flowField[x, y] = Vector2.zero;
+                    distanceMap[x, y] = int.MaxValue;
+                    flowMap[x, y] = Vector2.zero;
                 }
             }
 
-            // Добавляем все цели в очередь
-            foreach (var target in targets)
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+
+            foreach (var target in targetPositions)
             {
-                _queue.Enqueue(target);
-                _costField[target.x, target.y] = 0; // Цели имеют "нулевую стоимость"
+                int targetX = Mathf.RoundToInt(target.x);
+                int targetY = Mathf.RoundToInt(target.y);
+
+                if (targetX >= 0 && targetX < width && targetY >= 0 && targetY < height)
+                {
+                    queue.Enqueue(new Vector2Int(targetX, targetY));
+                    distanceMap[targetX, targetY] = 0;
+                }
             }
 
-            // Запускаем волновой алгоритм
-            while (_queue.Count > 0)
-            {
-                Vector2Int cell = _queue.Dequeue();
-                int cellCost = _costField[cell.x, cell.y];
+            Vector2Int[] directions =
+                { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) };
 
-                foreach (Vector2Int neighbor in GetNeighbors(cell))
+            while (queue.Count > 0)
+            {
+                Vector2Int current = queue.Dequeue();
+                int currentDistance = distanceMap[current.x, current.y];
+
+                foreach (var dir in directions)
                 {
-                    if (_costField[neighbor.x, neighbor.y] > cellCost + 1)
+                    Vector2Int neighbor = current + dir;
+
+                    if (neighbor.x >= 0 && neighbor.x < width && neighbor.y >= 0 && neighbor.y < height)
                     {
-                        _costField[neighbor.x, neighbor.y] = cellCost + 1;
-                        _queue.Enqueue(neighbor);
+                        int terrainCost = TerrainCost[details[neighbor.x, neighbor.y]];
+                        if (terrainCost == int.MaxValue) continue; // Стена - непроходимая
+
+                        int newDistance = currentDistance + terrainCost;
+                        if (newDistance < distanceMap[neighbor.x, neighbor.y])
+                        {
+                            distanceMap[neighbor.x, neighbor.y] = newDistance;
+                            queue.Enqueue(neighbor);
+                        }
                     }
                 }
             }
 
-            // Создаем векторное поле
-            for (int x = 0; x < _width; x++)
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < _height; y++)
+                for (int y = 0; y < height; y++)
                 {
-                    Vector2 bestDirection = Vector2.zero;
-                    int lowestCost = _costField[x, y];
+                    if (distanceMap[x, y] == int.MaxValue) continue;
 
-                    foreach (Vector2Int neighbor in GetNeighbors(new Vector2Int(x, y)))
+                    int minDistance = distanceMap[x, y];
+                    Vector2 bestDirection = Vector2.zero;
+
+                    foreach (var dir in directions)
                     {
-                        if (_costField[neighbor.x, neighbor.y] < lowestCost)
+                        int nx = x + dir.x;
+                        int ny = y + dir.y;
+
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height)
                         {
-                            lowestCost = _costField[neighbor.x, neighbor.y];
-                            bestDirection = ((Vector2)(neighbor - new Vector2Int(x, y))).normalized;
+                            if (distanceMap[nx, ny] < minDistance)
+                            {
+                                minDistance = distanceMap[nx, ny];
+                                bestDirection = new Vector2(dir.x, dir.y).normalized;
+                            }
                         }
                     }
 
-                    _flowField[x, y] = bestDirection;
+                    flowMap[x, y] = bestDirection;
                 }
             }
 
-            return _flowField;
-        }
-
-        private List<Vector2Int> GetNeighbors(Vector2Int cell)
-        {
-            List<Vector2Int> neighbors = new List<Vector2Int>();
-
-            Vector2Int[] directions =
-            {
-                new Vector2Int(0, 1), new Vector2Int(0, -1),
-                new Vector2Int(1, 0), new Vector2Int(-1, 0)
-            };
-
-            foreach (var dir in directions)
-            {
-                Vector2Int neighbor = cell + dir;
-                if (neighbor.x >= 0 && neighbor.x < _width && neighbor.y >= 0 && neighbor.y < _height)
-                {
-                    neighbors.Add(neighbor);
-                }
-            }
-
-            return neighbors;
+            return flowMap;
         }
     }
 }
