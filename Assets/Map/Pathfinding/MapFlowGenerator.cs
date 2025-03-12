@@ -9,9 +9,11 @@ namespace Map.Pathfinding
         private static readonly Dictionary<MapDetail, int> TerrainCost = new Dictionary<MapDetail, int>
         {
             { MapDetail.Wall, int.MaxValue },
+            { MapDetail.Gold, int.MaxValue },
             { MapDetail.Water, 10 },
             { MapDetail.Tree, 5 },
             { MapDetail.Grass, 1 },
+            { MapDetail.Sand, 2 },
             { MapDetail.Rock, 1 },
             { MapDetail.Empty, 1 }
         };

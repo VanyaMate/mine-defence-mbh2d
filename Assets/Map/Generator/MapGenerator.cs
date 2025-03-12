@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Map.Generator
 {
@@ -10,6 +11,8 @@ namespace Map.Generator
         public float grass;
         public float rock;
         public float empty;
+        public float gold;
+        public float sand;
     }
 
     public enum MapDetail
@@ -20,6 +23,8 @@ namespace Map.Generator
         Grass = 3,
         Rock = 4,
         Empty = 5,
+        Gold = 6,
+        Sand = 7,
     }
 
     public class MapGenerator : MonoBehaviour
@@ -34,19 +39,25 @@ namespace Map.Generator
         [SerializeField] private GameObject _grassPrefab;
         [SerializeField] private GameObject _rockPrefab;
         [SerializeField] private GameObject _emptyPrefab;
+        [SerializeField] private GameObject _goldPrefab;
+        [SerializeField] private GameObject _sandPrefab;
 
         [Header("Настройки")]
         [SerializeField] [Range(10, 400)] private int _xSize;
         [SerializeField] [Range(10, 400)] private int _ySize;
-        [SerializeField] [Range(0.0001f, 0.9999f)] private float _seed;
+        [SerializeField] [Range(0.1f, 0.2f)] private float _seedModificator;
+        [SerializeField] [Range(1, 1000)] private int _xSeed;
+        [SerializeField] [Range(1, 1000)] private int _ySeed;
 
         [Header("Расширенные настройки генерации")]
         [SerializeField] [Range(0, 1)] private float _wallRatio;
         [SerializeField] [Range(0, 1)] private float _waterRatio;
+        [SerializeField] [Range(0, .1f)] private float _goldRatio;
         [SerializeField] [Range(0, 100)] private float _treeRatio;
         [SerializeField] [Range(0, 100)] private float _grassRatio;
         [SerializeField] [Range(0, 100)] private float _rockRatio;
         [SerializeField] [Range(0, 100)] private float _emptyRatio;
+        [SerializeField] [Range(0, 100)] private float _sandRatio;
 
         public void Awake()
         {
@@ -62,9 +73,18 @@ namespace Map.Generator
                 this._treeRatio,
                 this._grassRatio,
                 this._rockRatio,
-                this._emptyRatio
+                this._emptyRatio,
+                this._goldRatio,
+                this._sandRatio
             );
-            MapDetail[,] mapDetails = this._GenerateMapDetails(this._xSize, this._ySize, this._seed, ratio);
+            MapDetail[,] mapDetails = this._GenerateMapDetails(
+                this._xSize,
+                this._ySize,
+                this._seedModificator,
+                this._xSeed,
+                this._ySeed,
+                ratio
+            );
             this._GenerateMap(
                 this._map,
                 mapDetails,
@@ -73,7 +93,9 @@ namespace Map.Generator
                 this._treePrefab,
                 this._grassPrefab,
                 this._rockPrefab,
-                this._emptyPrefab
+                this._emptyPrefab,
+                this._goldPrefab,
+                this._sandPrefab
             );
 
             return mapDetails;
@@ -87,34 +109,46 @@ namespace Map.Generator
             }
         }
 
-        private MapRatio _GetRatio(float wall, float water, float tree, float grass, float rock, float empty)
+        private MapRatio _GetRatio(
+            float wall,
+            float water,
+            float tree,
+            float grass,
+            float rock,
+            float empty,
+            float gold,
+            float sand
+            )
         {
             MapRatio ratio = new MapRatio
             {
                 wall = wall,
-                water = water
+                water = water,
+                gold = gold,
             };
 
-            float reserved = wall - water; // 0.8 - 0.2 = 0.6
+            float reserved = wall - water - gold;
 
             if (reserved > 0)
             {
-                float sum = tree + grass + rock + empty; // 80
-                float treeRatio = tree / sum; // 12 / 80 = ~0.15
-                float grassRatio = grass / sum; // 27 / 80 = ~0.33
-                float emptyRatio = empty / sum; // 40 / 80 = ~0.5
-                float rockRatio = rock / sum; // 10 / 80 = ~0.125
+                float sum = tree + grass + rock + empty + sand;
+                float treeRatio = tree / sum;
+                float grassRatio = grass / sum;
+                float emptyRatio = empty / sum;
+                float rockRatio = rock / sum;
+                float sandRatio = sand / sum;
 
-                ratio.tree = treeRatio * reserved + water; // 0.15 * 0.6 + 0.2 = 0.29
-                ratio.grass = grassRatio * reserved + ratio.tree; // 0.3 * 0.6 + 0.29 = 0.47
-                ratio.empty = emptyRatio * reserved + ratio.grass; // 0.77
-                ratio.rock = rockRatio * reserved + ratio.empty; // 0.842
+                ratio.tree = treeRatio * reserved + water;
+                ratio.grass = grassRatio * reserved + ratio.tree;
+                ratio.empty = emptyRatio * reserved + ratio.grass;
+                ratio.sand = sandRatio * reserved + ratio.empty;
+                ratio.rock = rockRatio * reserved + ratio.sand;
             }
 
             return ratio;
         }
 
-        private MapDetail[,] _GenerateMapDetails(int x, int z, float seed, MapRatio ratio)
+        private MapDetail[,] _GenerateMapDetails(int x, int z, float seed, int seedX, int seedY, MapRatio ratio)
         {
             MapDetail[,] details = new MapDetail[x, z];
 
@@ -122,11 +156,15 @@ namespace Map.Generator
             {
                 for (int j = 0; j < z; j++)
                 {
-                    float weight = Mathf.PerlinNoise(i * seed, j * seed);
+                    float weight = Mathf.PerlinNoise((i + seedX) * seed, (j + seedY) * seed);
 
                     if (weight > ratio.wall)
                     {
                         details[i, j] = MapDetail.Wall;
+                    }
+                    else if (weight > (ratio.wall - ratio.gold))
+                    {
+                        details[i, j] = MapDetail.Gold;
                     }
                     else if (weight < ratio.water)
                     {
@@ -135,9 +173,13 @@ namespace Map.Generator
                     else
                     {
                         // Порядок важен
-                        if (weight >= ratio.empty)
+                        if (weight >= ratio.sand)
                         {
                             details[i, j] = MapDetail.Rock;
+                        }
+                        else if (weight >= ratio.empty)
+                        {
+                            details[i, j] = MapDetail.Sand;
                         }
                         else if (weight >= ratio.grass)
                         {
@@ -167,7 +209,10 @@ namespace Map.Generator
             GameObject treePrefab,
             GameObject grassPrefab,
             GameObject rockPrefab,
-            GameObject emptyPrefab
+            GameObject emptyPrefab,
+            GameObject goldPrefab,
+            GameObject sandPrefab
+
         )
         {
             for (int x = 0; x < details.GetLength(0); x++)
@@ -180,6 +225,9 @@ namespace Map.Generator
                         case MapDetail.Wall:
                             prefab = wallPrefab;
                             break;
+                        case MapDetail.Gold:
+                            prefab = goldPrefab;
+                            break;
                         case MapDetail.Water:
                             prefab = waterPrefab;
                             break;
@@ -188,6 +236,9 @@ namespace Map.Generator
                             break;
                         case MapDetail.Grass:
                             prefab = grassPrefab;
+                            break;
+                        case MapDetail.Sand:
+                            prefab = sandPrefab;
                             break;
                         case MapDetail.Rock:
                             prefab = rockPrefab;
