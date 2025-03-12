@@ -1,0 +1,12 @@
+# ninja log v5
+17	3200	7634505630384818	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	e90ad7141d67d1f9
+0	3208	7634505630344808	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	171e1cfc27a4b455
+116	3221	7634505630519961	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	75c58add6bcfe97b
+104	3228	7634505630324811	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	26de303eb8349ae2
+110	3256	7634505631135420	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	98d7217a0e85345b
+13	3285	7634505631466182	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	1a0a0c8e131a9cea
+22	3422	7634505632835084	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	2ddd037a13b5122b
+3202	3463	7634505633293882	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	dcf880a51570e03a
+8	3542	7634505634050008	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	4d0d6100e63122de
+3463	3849	7634505637165157	C:/dev/unity/Mine defence MBH2D/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/183v13u3/obj/arm64-v8a/libswappywrapper.so	32a5ba1fdcc5f285
+3542	3852	7634505637165157	C:/dev/unity/Mine defence MBH2D/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/183v13u3/obj/arm64-v8a/libgame.so	4665d7029298af7a

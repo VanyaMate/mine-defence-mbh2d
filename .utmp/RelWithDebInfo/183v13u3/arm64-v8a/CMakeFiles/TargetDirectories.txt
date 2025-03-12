@@ -1,0 +1,8 @@
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/FramePacing/CMakeFiles/swappywrapper.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/FramePacing/CMakeFiles/edit_cache.dir
+C:/dev/unity/Mine defence MBH2D/.utmp/RelWithDebInfo/183v13u3/arm64-v8a/FramePacing/CMakeFiles/rebuild_cache.dir

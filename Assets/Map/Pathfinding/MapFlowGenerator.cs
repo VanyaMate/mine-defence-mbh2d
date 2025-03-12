@@ -49,7 +49,10 @@ namespace Map.Pathfinding
             }
 
             Vector2Int[] directions =
-                { new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1) };
+            {
+                new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1),
+                new Vector2Int(1, 1), new Vector2Int(-1, -1), new Vector2Int(1, -1), new Vector2Int(-1, 1)
+            };
 
             while (queue.Count > 0)
             {
@@ -63,7 +66,7 @@ namespace Map.Pathfinding
                     if (neighbor.x >= 0 && neighbor.x < width && neighbor.y >= 0 && neighbor.y < height)
                     {
                         int terrainCost = TerrainCost[details[neighbor.x, neighbor.y]];
-                        if (terrainCost == int.MaxValue) continue; // Стена - непроходимая
+                        if (terrainCost == int.MaxValue) continue;
 
                         int newDistance = currentDistance + terrainCost;
                         if (newDistance < distanceMap[neighbor.x, neighbor.y])

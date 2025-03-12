@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Map.Generator
 {
@@ -59,8 +58,12 @@ namespace Map.Generator
         [SerializeField] [Range(0, 100)] private float _emptyRatio;
         [SerializeField] [Range(0, 100)] private float _sandRatio;
 
+
+        private MapDetail[,] _currentMapDetails = new MapDetail[,] { };
+
         public void Awake()
         {
+            this.GenerateMap();
         }
 
 
@@ -77,7 +80,7 @@ namespace Map.Generator
                 this._goldRatio,
                 this._sandRatio
             );
-            MapDetail[,] mapDetails = this._GenerateMapDetails(
+            this._currentMapDetails = this._GenerateMapDetails(
                 this._xSize,
                 this._ySize,
                 this._seedModificator,
@@ -87,7 +90,7 @@ namespace Map.Generator
             );
             this._GenerateMap(
                 this._map,
-                mapDetails,
+                this._currentMapDetails,
                 this._wallPrefab,
                 this._waterPrefab,
                 this._treePrefab,
@@ -98,7 +101,12 @@ namespace Map.Generator
                 this._sandPrefab
             );
 
-            return mapDetails;
+            return this._currentMapDetails;
+        }
+
+        public MapDetail[,] GetCurrentMapDetails()
+        {
+            return this._currentMapDetails;
         }
 
         private void _ClearMap(Transform map)
