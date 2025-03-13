@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Gun.Bullet;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Gun

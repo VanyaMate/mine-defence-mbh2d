@@ -109,6 +109,17 @@ namespace Map.Generator
             return this._currentMapDetails;
         }
 
+        public MapDetail GetMapDetailsByPosition(Vector2Int position)
+        {
+            if (position.x < 0 || position.x >= this._currentMapDetails.GetLength(0) || position.y < 0 ||
+                position.y >= this._currentMapDetails.GetLength(1))
+            {
+                return MapDetail.Wall;
+            }
+
+            return this._currentMapDetails[position.x, position.y];
+        }
+
         private void _ClearMap(Transform map)
         {
             for (int i = map.childCount - 1; i >= 0; i--)
