@@ -1,4 +1,5 @@
-﻿using Map.Generator;
+﻿using Friendly;
+using Map.Generator;
 using UnityEngine;
 
 namespace Map.Pathfinding
@@ -24,7 +25,7 @@ namespace Map.Pathfinding
             {
                 this._flowMap = MapFlowGenerator.GetFlowMap(
                     this._mapGenerator.GetCurrentMapDetails(),
-                    new Vector2[] { new Vector2(25, 25) }
+                    FriendlyContainer.instance.GetPositionsArray()
                 );
 
                 this._regenerateTimer = 0f;

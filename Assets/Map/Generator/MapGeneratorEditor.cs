@@ -9,6 +9,8 @@ namespace Map.Generator
     {
         public override void OnInspectorGUI()
         {
+            if (target == null) return;
+
             DrawDefaultInspector();
 
             MapGenerator generator = (MapGenerator)target;

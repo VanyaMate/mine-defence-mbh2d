@@ -75,8 +75,6 @@ namespace Gun
                     float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                     transform.rotation = Quaternion.Euler(0, 0, angle);
 
-                    Debug.Log($"FireTimer {this._fireTimer} / {this._fireTimeMax}");
-
                     if (this._fireTimer > this._fireTimeMax)
                     {
                         BulletMovement bullet = Instantiate(this._bulletPrefab, this._spawnPosition.position, Quaternion.identity);
